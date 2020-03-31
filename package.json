@@ -1,0 +1,21 @@
+{
+  "name": "corona-central",
+  "version": "0.1.0",
+  "description": "",
+  "scripts": {
+    "dev": "shadow-cljs watch app",
+    "release": "shadow-cljs release app",
+    "server": "shadow-cljs server",
+    "clean": "rm -rf target && rm -rf public/corona/js"
+  },
+  "author": "",
+  "license": "WTFPL",
+  "dependencies": {
+    "p5": "^1.0.0",
+    "react": "16.9.0",
+    "react-dom": "16.9.0"
+  },
+  "devDependencies": {
+    "shadow-cljs": "^2.8.94"
+  }
+}
