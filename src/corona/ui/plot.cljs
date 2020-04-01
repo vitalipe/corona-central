@@ -5,47 +5,35 @@
     [alpakit.widget :refer [defw]]
     [alpakit.p5 :refer [p5-canvas]]
 
-    [corona.ui.theme :refer [plot-i-color plot-s-color plot-r-color]]
     [corona.math  :refer [ceil round]]
-    [corona.sim :as sim]))
+    [corona.sim :as sim]
+    [corona.ui.theme :refer [plot-i-color
+                             plot-s-color
+                             plot-r-color
+                             plot-highlight-color]]))
 
 ;;; WIP
-(def demo-sim (reduce
-                (fn [s _] (conj s (sim/step (last s))))
-                [(sim/init {:w 100 :h 100} [100 1 0])]
-                (range 100)))
+(defonce demo-sim (reduce
+                    (fn [s _] (conj s (sim/step (last s))))
+                    [(sim/init {:w 100 :h 100} [100 3 10])]
+                    (range 42)))
 
-(def demo-data (mapv :report demo-sim))
+(defonce demo-data (mapv :report demo-sim))
 ;;;
 
 
-(defn draw-susceptible! [ctx w h x-points]
+(defn draw-area! [ctx [x y w h] color width points]
   (doto ctx
-    (.fill plot-s-color)
+    (.fill color)
     (.beginShape)
-    (.vertex 0 h))
+    (.vertex x (+ y h)))
 
-  (loop [[[pos-x {I :I S :S} i] & points] x-points]
-    (.vertex ctx pos-x (- h (* (+ I S) h)))
-    (when-not (empty? points) (recur points)))
-
-  (doto ctx
-    (.vertex w h)
-    (.endShape)))
-
-
-(defn draw-infected! [ctx w h x-points]
-  (doto ctx
-    (.fill plot-i-color)
-    (.beginShape)
-    (.vertex 0 h))
-
-  (loop [[[pos-x {I :I} i] & points] x-points]
-    (.vertex ctx pos-x (- h (* (+ I) h)))
-    (when-not (empty? points) (recur points)))
+  (loop [[p & points] points, x x]
+    (.vertex ctx x (- (+ y h) (* (+ p) h)))
+    (when-not (empty? points) (recur points (+ x width))))
 
   (doto ctx
-    (.vertex w h)
+    (.vertex (+ x w) (+ y h))
     (.endShape)))
 
 
@@ -55,25 +43,45 @@
              (let [w (.-width ctx)
                    h (.-height ctx)
 
-                   ;; number of x values?
-                   x-n (min
-                         (quot w 20)
-                         (count demo-data))
+                   mouse-x (.-pmouseX ctx)
 
-                   ;; how far are the x values in px?
-                   xw-px (quot w  x-n)
+                   ;; graph bbox
+                   g-w (- w 50)
+                   g-h (- h 50)
+                   g-x 30
+                   g-y 2
 
-                   step-size (round (/ (count demo-data) x-n))
-
-                  ;; vector of [x-pos, {:S .. :I .. :R ..}, value]
-                   x-points (map vector
-                              (range 0 w xw-px)
-                              (take-nth step-size demo-data)
-                              (range 0 99999 step-size))]
+                   xw-px (/ g-w (max 0 (dec (count demo-data))))
+                   i-points (map :I                           demo-data)
+                   s-points (map (fn [{:keys [I S]}] (+ I S)) demo-data)]
 
                (doto ctx
-                (.background plot-r-color)
-                (.noStroke))
+                (.background 0 0 0)
+                (.noStroke)
+                (.fill plot-r-color)
+                (.rect g-x g-y g-w g-h))
 
-              (draw-susceptible! ctx w h x-points)
-              (draw-infected! ctx w h x-points)))])
+              (draw-area! ctx [g-x g-y g-w g-h] plot-s-color xw-px s-points)
+              (draw-area! ctx [g-x g-y g-w g-h] plot-i-color xw-px i-points)
+
+              ;; yellow bar
+              (when (< g-x mouse-x (+ g-x g-w))
+                (doto ctx
+                  (.stroke plot-highlight-color)
+                  (.line mouse-x (+ 1 g-y) mouse-x (+ -1 g-y g-h))))
+
+              ;; HUD
+              (doto ctx
+                (.stroke 255 255 255)
+                (.strokeWeight 0.75)
+                (.line g-x, g-y, g-x, (+ g-y g-h 10))
+                (.line (- g-x 10), (+ g-y g-h), (+ g-x g-w), (+ g-y g-h)))
+
+              (doall
+                (->>
+                  (range 0 1 0.1)
+                  (map #(.line ctx
+                          (+ 4 g-x,)
+                          (+ g-y (* g-h %)),
+                          (+ -4 g-x,)
+                          (+ g-y (* g-h %))))))))])

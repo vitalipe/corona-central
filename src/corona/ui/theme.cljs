@@ -30,6 +30,9 @@
 (def plot-i-color #js[245 102 84])
 (def plot-r-color #js[68 67 69])
 
+(def plot-highlight-color #js[251 255 21])
+
+
 (def stage-s-color #js[116 195 206])
 (def stage-i-color #js[245 102 84])
 (def stage-r-color #js[68 67 69])
