@@ -6,13 +6,13 @@
     [alpakit.p5 :refer [p5-canvas]]
 
     [corona.math  :refer [ceil round]]
-    [corona.sim :as sim]
+    [corona.sim.naive :as sim]
     [corona.ui.theme :refer [plot-i-color
                              plot-s-color
                              plot-r-color
                              plot-highlight-color]]))
 
-;;; WIP
+;;; WIP REMOVE
 (defonce demo-sim (reduce
                     (fn [s _] (conj s (sim/step (last s))))
                     [(sim/init {:w 100 :h 100} [100 3 5])]

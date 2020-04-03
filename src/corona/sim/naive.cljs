@@ -1,4 +1,4 @@
-(ns corona.sim
+(ns corona.sim.naive
   (:require
     [alpakit.util :refer [pivot-by map-vals]]
     [corona.math  :refer [clamp **]]))
