@@ -37,11 +37,11 @@
 (def color-disabled  (rgb 211 211 211))
 
 
-(def plot-s-color #js[49 97 110])
-(def plot-i-color #js[245 102 84])
-(def plot-r-color #js[68 67 69])
+(def plot-s-color #js[207 226 243])
+(def plot-i-color #js[255 242 205])
+(def plot-r-color #js[211 211 211])
 
-(def plot-highlight-color #js[251 255 21])
+(def plot-highlight-color #js[0 0 0])
 
 
 (def stage-s-color #js[116 195 206])
