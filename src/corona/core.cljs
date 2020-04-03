@@ -3,7 +3,7 @@
     [reagent.core :as r]
 
     [alpakit.widget :refer [defw]]
-    [alpakit.core :as alpakit :refer [app surface]]
+    [alpakit.core :as alpakit :refer [element app surface]]
     [alpakit.layout :as layout]
     [alpakit.p5 :refer [p5-canvas]]
 
@@ -14,22 +14,29 @@
     [corona.ui.stage :refer [stage]]))
 
 
+(defw controls []
+  [surface :css {:background-color theme/color-secondary
+                 :padding "1rem"}
+   "controls here..."])
+
+
 (defw sandbox []
   [surface :css {:width "100%"}
-           :layout (layout/grid :areas ["1fr"       "1fr"
-                                        [:graph    :stage]    "400px"
-                                        [:controls :controls] "300px"])
+           :layout (layout/grid :gap "2rem"
+                                :areas ["1fr"    "30rem"
+                                        [:graph :controls] "200px"
+                                        [:stage :controls] "1fr"])
       ^{:key :stage}    [stage]
       ^{:key :graph}    [graph]
-      ^{:key :controls} [surface "sim controls"]])
-
+      ^{:key :controls} [controls]])
 
 (defw corona-app []
   :state {screen :menu}
 
   [app :theme [theme/baseline-css theme/global-css]
     [surface  :layout (layout/h-box :justify :center)
-              :css {:padding "6rem"}
+              :css {:padding "6rem"
+                    :height "100vh"}
 
      (case screen
        :menu [main-menu :on-select #(reset! screen %)

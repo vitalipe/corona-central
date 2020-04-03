@@ -15,7 +15,7 @@
 ;;; WIP
 (defonce demo-sim (reduce
                     (fn [s _] (conj s (sim/step (last s))))
-                    [(sim/init {:w 100 :h 100} [100 3 10])]
+                    [(sim/init {:w 100 :h 100} [100 3 5])]
                     (range 42)))
 
 (defonce demo-data (mapv :report demo-sim))
@@ -38,7 +38,11 @@
 
 
 (defw graph []
+  :state {has-mouse? false}
   [p5-canvas
+     :-attr {:on-mouse-enter (fn [_] (reset! has-mouse? true))
+             :on-mouse-leave (fn [_] (reset! has-mouse? false))}
+     :ratio :auto
      :draw (fn [ctx]
              (let [w (.-width ctx)
                    h (.-height ctx)
@@ -46,17 +50,16 @@
                    mouse-x (.-pmouseX ctx)
 
                    ;; graph bbox
-                   g-w (- w 50)
-                   g-h (- h 50)
-                   g-x 30
-                   g-y 2
+                   g-w (- w 0)
+                   g-h (- h 0)
+                   g-x 0
+                   g-y 0
 
                    xw-px (/ g-w (max 0 (dec (count demo-data))))
                    i-points (map :I                           demo-data)
                    s-points (map (fn [{:keys [I S]}] (+ I S)) demo-data)]
 
                (doto ctx
-                (.background 0 0 0)
                 (.noStroke)
                 (.fill plot-r-color)
                 (.rect g-x g-y g-w g-h))
@@ -64,22 +67,21 @@
               (draw-area! ctx [g-x g-y g-w g-h] plot-s-color xw-px s-points)
               (draw-area! ctx [g-x g-y g-w g-h] plot-i-color xw-px i-points)
 
-              ;; yellow bar
-              (when (< g-x mouse-x (+ g-x g-w))
-                (doto ctx
-                  (.stroke plot-highlight-color)
-                  (.line mouse-x (+ 1 g-y) mouse-x (+ -1 g-y g-h))))
+              ;; hover bar
+              (when has-mouse?
+                (when (< g-x mouse-x (+ g-x g-w))
+                  (doto ctx
+                    (.stroke plot-highlight-color)
+                    (.line mouse-x (+ 1 g-y) mouse-x (+ -1 g-y g-h)))))
 
               ;; HUD
               (doto ctx
-                (.stroke 255 255 255)
-                (.strokeWeight 0.75)
-                (.line g-x, g-y, g-x, (+ g-y g-h 10))
-                (.line (- g-x 10), (+ g-y g-h), (+ g-x g-w), (+ g-y g-h)))
+                (.stroke 0 0 0)
+                (.strokeWeight 0.75))
 
               (doall
                 (->>
-                  (range 0 1 0.1)
+                  (range 0.1 1 0.1)
                   (map #(.line ctx
                           (+ 4 g-x,)
                           (+ g-y (* g-h %)),
