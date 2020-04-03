@@ -17,9 +17,12 @@
 (defn ratio+bbox->size [initial ratio bbox]
   (let [width  (if (= :auto (initial 0)) (.-width bbox)  (initial 0))
         height (if (= :auto (initial 1)) (.-height bbox) (initial 1))]
-    (if (> (/ width height) ratio)
-      [(* height ratio) height]
-      [width (/ width ratio)])))
+    (cond
+      (= ratio :auto)             [width height]
+      (> (/ width height) ratio)  [(* height ratio) height]
+      (< (/ width height) ratio)  [width (/ width ratio)]
+      (= (/ width height) ratio)  [width height])))
+
 
 
 (defn init-p5! [draw {:keys [fps width height]} p5-instance]
@@ -36,9 +39,12 @@
                  size
                  target-fps
                  draw
+                 -attr ;; FIXME: this should be auomatic
+                 css  ;; FIXME: this should be auomatic
                  :or {size [:auto :auto]
                       ratio (/ 4 3)
-                      target-fps 30}]
+                      target-fps 30
+                      -attr {}}]
 
   (r/with-let [!cleanup (atom nil)
                init! (only-once ;; refs are wierd.. they are called with nil on every update..
@@ -60,10 +66,12 @@
                                           (.remove instance)
                                           (.unobserve resize-observer node))))))]
 
-    [surface :css {:overflow "hidden"
-                   :display "flex"
-                   :align-items "center"
-                   :justify-content "center"}
-             :-attr {:ref init!}]
+    [surface :css (merge
+                   css
+                   {:overflow "hidden"
+                    :display "flex"
+                    :align-items "center"
+                    :justify-content "center"})
+             :-attr (merge  -attr {:ref init!})]
 
     (finally (@!cleanup))))
