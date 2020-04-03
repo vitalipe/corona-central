@@ -1,4 +1,5 @@
-(ns corona.ui.theme)
+(ns corona.ui.theme
+  (:require [garden.color :refer [rgb]]))
 
 ;; moar reset css
 (def baseline-css [[:html {:-ms-text-size-adjust     "100%"
@@ -21,9 +22,19 @@
                    [:textarea {:resize "none"}]])
 
 
-(def global-css [[:html {:font-size "16px"}]
-                 [:body {:color            "white"
-                         :background-color "black"}]])
+(def global-css [[:html {:font-size "16px"
+                         :font-family "'Press Start 2P', cursive"
+                         :letter-spacing   "1px"}]
+
+                 [:body {:color            "black"
+                         :background-color "white"
+                         :user-select "none"}]])
+
+
+;; FIXME: unify garden colors with JS colors!
+(def color-primary   (rgb 255 242 205))
+(def color-secondary (rgb 207 226 243))
+(def color-disabled  (rgb 211 211 211))
 
 
 (def plot-s-color #js[49 97 110])
