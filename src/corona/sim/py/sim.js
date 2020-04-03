@@ -23,7 +23,7 @@ function person_dict(loc_x = 0, loc_y = 0, c_status = 0,
         "detected": detected,
         "y_speed": y_speed,
         "infected_by": infected_by,
-        "infection_timestamp":infection_timestamp, //day number
+        "infection_timestamp": infection_timestamp, //day number
         "quarantine": quarantine,
     };
     return person
@@ -48,6 +48,67 @@ function player_quarantine(maparr, population, money_state, level) {// gets call
 
     return [maparr, population, money_state];
 };
+
+function getRandomSubarray(arr, size) { // we can also use
+    /*
+        _und = require('underscore');
+    function sample(a, n) {
+        return _und.take(_und.shuffle(a), n);
+    }
+     */
+    var shuffled = arr.slice(0), i = arr.length, min = i - size, temp, index;
+    while (i-- > min) {
+        index = Math.floor((i + 1) * Math.random());
+        temp = shuffled[index];
+        shuffled[index] = shuffled[i];
+        shuffled[i] = temp;
+    }
+    return shuffled.slice(min);
+};
+
+
+function educate_about_hygiene(maparr, population, money_state, level) {// gets called once per level
+    let population_under_effect = level * 20;
+    var people = [];
+    for (var p_status in population) {
+        for (var idnum in population[p_status]) {
+            people.push([p_status, idnum])
+        }
+    }
+    let amount_of_people_to_check = Math.floor((people.length * population_under_effect) / 100); //how many effected
+    var people_to_affect = getRandomSubarray(people, amount_of_people_to_check);
+    for (let i=0; i < people_to_affect.length; i++) {
+        let [p_status, idnum] = people[i];
+        population[p_status][idnum]['infection_chance'] *= 0.5 // 20 -> 10 -> 5 -> 2.5
+    }
+
+    money_state["prices_modifier"] += 15;
+    money_state["daily_income"] = Math.floor(money_state["daily_income"] * 0.85);
+
+    return [maparr, population, money_state];
+};
+
+
+function keep_distance(maparr, population, money_state, level) {// gets called once per level
+    let population_under_effect = level * 25;
+    var people = [];
+    for (var p_status in population) {
+        for (var idnum in population[p_status]) {
+            people.push([p_status, idnum])
+        }
+    }
+    let amount_of_people_to_check = Math.floor((people.length * population_under_effect) / 100); //how many effected
+    var people_to_affect = getRandomSubarray(people, amount_of_people_to_check);
+    for (let i=0; i < people_to_affect.length; i++) {
+        let [p_status, idnum] = people[i];
+        population[p_status][idnum]['infection_radius'] -= 1 // 2 -> 1 -> 0 -> -1
+    }
+    money_state["prices_modifier"] += 15;
+    money_state["daily_income"] = Math.floor(money_state["daily_income"] * 0.85);
+
+    return [maparr, population, money_state];
+};
+
 
 function stay_the_fuck_at_home(maparr, population, level) {
     let population_under_effect = level * 20;
@@ -76,7 +137,7 @@ function stay_the_fuck_at_home(maparr, population, level) {
 
     }
     return [maparr, population];
-}
+};
 
 function player_detect_infecteds(maparr, population, level) {// gets called regularly
     //בדיקות בשביל לבודד חולים (בידוד) (ברק)
@@ -199,14 +260,14 @@ export var generate_person = function* (infection_in_population, max_y, max_x, s
     }
 ;
 
-function recovery(population, current_day){//to be called after week 4 and every week afterwards
+function recovery(population, current_day) {//to be called after week 4 and every week afterwards
     let infected_status = "i";
     let recovered_status = "r";
-    for (var idnum in population[infected_status]){
+    for (var idnum in population[infected_status]) {
         let person = population[infected_status][idnum]
         let infection_day = person["infection_timestamp"]
-        if (((infection_day - current_day)/7) > 4 ){ //4weeks have passed
-            if (get_random_chance()<75){ // 75% recovery chance
+        if (((infection_day - current_day) / 7) > 4) { //4weeks have passed
+            if (get_random_chance() < 75) { // 75% recovery chance
                 population[recovered_status][idnum] = population[infected_status].py_pop(idnum)
             }
         }
@@ -238,7 +299,7 @@ export var infection_spreading = function (maparr, population, max_y, max_x, cur
                     maparr: maparr
                 }
             ));
-            for (var [y, x]of people_locs) for (var idnum of maparr[y][x]) {
+            for (var [y, x] of people_locs) for (var idnum of maparr[y][x]) {
                 var person = maparr[y][x][idnum];
                 if (person["status"] == "s") {
                     var infection_success = try_to_infect(infected_person, person);
@@ -260,7 +321,7 @@ export var infection_spreading = function (maparr, population, max_y, max_x, cur
 ;
 
 export var move_one_step = function (maparr, population, max_y, max_x) {
-        for (var p_status of population) for (var [idnum, person]of population[p_status].py_items()) if (!person["quarantine"]) {
+        for (var p_status of population) for (var [idnum, person] of population[p_status].py_items()) if (!person["quarantine"]) {
             var y = person["loc_y"];
             var x = person["loc_x"];
             var y_speed = person["y_speed"];
@@ -310,10 +371,15 @@ export var move_one_step = function (maparr, population, max_y, max_x) {
     }
 ;
 export var create_maparr = function (ylen, xlen) {
-        return new Array(ylen).fill(new Array(xlen).fill(dict({})));
-        // return np.full([ylen, xlen], dict({}))
+    var map_arr = [];
+    for (let y = 0; y < ylen; y++) {
+        map_arr[y] = []; // create nested array
+        for (let x = 0; x < xlen; x++) {
+            map_arr[y][x] = {}; // put empty dict
+        }
     }
-;
+    return map_arr;
+};
 
 function initial_investments_state() {
     let investments = {
