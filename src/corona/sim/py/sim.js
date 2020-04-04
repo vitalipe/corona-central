@@ -66,7 +66,7 @@ function getRandomSubarray(arr, size) { // we can also use
 };
 
 
-function educate_about_hygiene(maparr, population, money_state, level) {// gets called once per level
+function player_educate_about_hygiene(maparr, population, money_state, level) {// gets called once per level
     let population_under_effect = level * 20;
     var people = [];
     for (var p_status in population) {
@@ -88,7 +88,7 @@ function educate_about_hygiene(maparr, population, money_state, level) {// gets 
 };
 
 
-function keep_distance(maparr, population, money_state, level) {// gets called once per level
+function player_keep_distance(maparr, population, money_state, level) {// gets called once per level
     let population_under_effect = level * 25;
     var people = [];
     for (var p_status in population) {
