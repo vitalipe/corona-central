@@ -48,6 +48,67 @@ export function player_quarantine(maparr, population, money_state, level) {// ge
     return [maparr, population, money_state];
 };
 
+function getRandomSubarray(arr, size) { // we can also use
+    /*
+        _und = require('underscore');
+    function sample(a, n) {
+        return _und.take(_und.shuffle(a), n);
+    }
+     */
+    var shuffled = arr.slice(0), i = arr.length, min = i - size, temp, index;
+    while (i-- > min) {
+        index = Math.floor((i + 1) * Math.random());
+        temp = shuffled[index];
+        shuffled[index] = shuffled[i];
+        shuffled[i] = temp;
+    }
+    return shuffled.slice(min);
+};
+
+
+function player_educate_about_hygiene(maparr, population, money_state, level) {// gets called once per level
+    let population_under_effect = level * 20;
+    var people = [];
+    for (var p_status in population) {
+        for (var idnum in population[p_status]) {
+            people.push([p_status, idnum])
+        }
+    }
+    let amount_of_people_to_check = Math.floor((people.length * population_under_effect) / 100); //how many effected
+    var people_to_affect = getRandomSubarray(people, amount_of_people_to_check);
+    for (let i=0; i < people_to_affect.length; i++) {
+        let [p_status, idnum] = people[i];
+        population[p_status][idnum]['infection_chance'] *= 0.5 // 20 -> 10 -> 5 -> 2.5
+    }
+
+    money_state["prices_modifier"] += 15;
+    money_state["daily_income"] = Math.floor(money_state["daily_income"] * 0.85);
+
+    return [maparr, population, money_state];
+};
+
+
+function player_keep_distance(maparr, population, money_state, level) {// gets called once per level
+    let population_under_effect = level * 25;
+    var people = [];
+    for (var p_status in population) {
+        for (var idnum in population[p_status]) {
+            people.push([p_status, idnum])
+        }
+    }
+    let amount_of_people_to_check = Math.floor((people.length * population_under_effect) / 100); //how many effected
+    var people_to_affect = getRandomSubarray(people, amount_of_people_to_check);
+    for (let i=0; i < people_to_affect.length; i++) {
+        let [p_status, idnum] = people[i];
+        population[p_status][idnum]['infection_radius'] -= 1 // 2 -> 1 -> 0 -> -1
+    }
+    money_state["prices_modifier"] += 15;
+    money_state["daily_income"] = Math.floor(money_state["daily_income"] * 0.85);
+
+    return [maparr, population, money_state];
+};
+
+
 function stay_the_fuck_at_home(maparr, population, level) {
     let population_under_effect = level * 20;
     var people = new Array();
@@ -75,7 +136,7 @@ function stay_the_fuck_at_home(maparr, population, level) {
 
     }
     return [maparr, population];
-}
+};
 
 export function player_detect_infecteds(maparr, population, level) {// gets called regularly
     //בדיקות בשביל לבודד חולים (בידוד) (ברק)
@@ -220,6 +281,7 @@ function try_to_infect(infected_person, person) {
         return false
     }
 ;
+
 function infection_spreading(maparr, population, max_y, max_x, current_day) {
         var newly_infecteds = new Set();
         //Object.values(population["i"])
@@ -254,6 +316,7 @@ function infection_spreading(maparr, population, max_y, max_x, current_day) {
         return [maparr, population];
     }
 ;
+
 
 function move_one_step(maparr, population, max_y, max_x) {
         for (var p_status of population)
@@ -297,6 +360,7 @@ function move_one_step(maparr, population, max_y, max_x) {
         return [maparr, population];
     }
 ;
+
 function create_maparr(ylen, xlen) {
     var map_arr = [];
     for (let y = 0; y < ylen; y++) {
