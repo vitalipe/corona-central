@@ -342,18 +342,17 @@ function move_one_step(maparr, population, max_y, max_x) {
 
                         var new_x_speed = x < new_x_dest ? 1 : -1;
                         var new_y_speed = y < new_y_dest ? 1 : -1;
-                        var pu = {
-                                "x_speed": new_x_speed,
-                                "y_speed": y < new_y_dest ? 1 : -1,
-                                "x_dest": new_x_dest,
-                                "y_dest": new_y_dest
-                            };
-                        population[p_status][idnum].py_update(pu)
+
+                        population[p_status][idnum]["x_speed"]= new_x_speed;
+                        population[p_status][idnum]["y_speed"]= new_y_speed ;
+                        population[p_status][idnum]["x_dest"]= new_x_dest;
+                        population[p_status][idnum]["y_dest"]= new_y_dest;
+
                     }
                     if (_is_pos_in_map(new_y, new_x, max_y, max_x)) {
-                        var pu = {"x_speed": new_x_speed, "y_speed": new_y_speed};
                         [maparr, population] = move_person(maparr, population, idnum, p_status, new_x, new_y);
-                        population[p_status][idnum].py_update(pu)
+                        population[p_status][idnum][x_speed] = new_x_speed;
+                        population[p_status][idnum][y_speed] = new_y_speed;
                     }
                 }
             }
