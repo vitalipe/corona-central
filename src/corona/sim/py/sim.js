@@ -7,7 +7,7 @@ function person_dict(loc_x = 0, loc_y = 0, c_status = 0,
                      infection_radius = 0, infection_chance = 0,
                      x_home = 0, y_home = 0, x_dest = 0, y_dest = 0,
                      x_speed = 0, y_speed = 0, detected = 0, infection_timestamp = 0,
-                     infected_by = -1, quarantine = 0) {
+                     infected_by = -1, quarantine = 0,idnum = 0) {
     let person = {
         "loc_x": loc_x,
         "loc_y": loc_y,
@@ -24,6 +24,7 @@ function person_dict(loc_x = 0, loc_y = 0, c_status = 0,
         "infected_by": infected_by,
         "infection_timestamp": infection_timestamp, //day number
         "quarantine": quarantine,
+        "idnum":idnum,
     };
     return person
 };
