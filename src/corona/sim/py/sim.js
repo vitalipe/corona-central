@@ -76,7 +76,7 @@ function player_educate_about_hygiene(maparr, population, money_state, level) {/
     }
     let amount_of_people_to_check = Math.floor((people.length * population_under_effect) / 100); //how many effected
     var people_to_affect = getRandomSubarray(people, amount_of_people_to_check);
-    for (let i=0; i < people_to_affect.length; i++) {
+    for (let i = 0; i < people_to_affect.length; i++) {
         let [p_status, idnum] = people[i];
         population[p_status][idnum]['infection_chance'] *= 0.5 // 20 -> 10 -> 5 -> 2.5
     }
@@ -98,7 +98,7 @@ function player_keep_distance(maparr, population, money_state, level) {// gets c
     }
     let amount_of_people_to_check = Math.floor((people.length * population_under_effect) / 100); //how many effected
     var people_to_affect = getRandomSubarray(people, amount_of_people_to_check);
-    for (let i=0; i < people_to_affect.length; i++) {
+    for (let i = 0; i < people_to_affect.length; i++) {
         let [p_status, idnum] = people[i];
         population[p_status][idnum]['infection_radius'] -= 1 // 2 -> 1 -> 0 -> -1
     }
@@ -187,71 +187,73 @@ function move_person(maparr, population, idnum, p_status, new_x, new_y) {//will 
     return [maparr, population]
 };
 
-function _is_pos_in_map (y, x, max_y, max_x) {
-        return (((max_x > x) && (x > 0)) && ((max_y > y) && (y > 0)))
-    };
+function _is_pos_in_map(y, x, max_y, max_x) {
+    return (((max_x > x) && (x > 0)) && ((max_y > y) && (y > 0)))
+};
 
 function _get_next_position(y, x, y_speed, x_speed) {
-        return [y + y_speed, x + x_speed];
-    };
+    return [y + y_speed, x + x_speed];
+};
 
 function get_surrounding_people(maparr, y, x, r, max_y, max_x) {
-        var people_loc = new Set();
-        for (var i = x - r; i < x + r + 1; i++)
-            for (var j = y - r; j < y + r + 1; j++)
-                if (_is_pos_in_map(j, i, max_y, max_x) && (i != x || j != y))
-                    //Object.keys(maparr[j][i]).length
-                    if (Object.keys(maparr[j][i]).length > 0)
-                        people_loc.add([j, i]);
-        return people_loc
-    }
+    var people_loc = new Set();
+    for (var i = x - r; i < x + r + 1; i++)
+        for (var j = y - r; j < y + r + 1; j++)
+            if (_is_pos_in_map(j, i, max_y, max_x) && (i != x || j != y))
+                //Object.keys(maparr[j][i]).length
+                if (Object.keys(maparr[j][i]).length > 0)
+                    people_loc.add([j, i]);
+    return people_loc
+}
 ;
-function get_new_destination(max_y, max_x) {
-        var x = getRandomInt(max_x);
 
-        var y = getRandomInt(max_y);
-        return [y, x];
-    }
+function get_new_destination(max_y, max_x) {
+    var x = getRandomInt(max_x);
+
+    var y = getRandomInt(max_y);
+    return [y, x];
+}
 ;
+
 function get_surroundings(y, x, r, max_y, max_x) {
-        var dots = new Set();
-        for (var i = x - r; i < x + r + 1; i++)
-            for (var j = y - r; j < y + r + 1; j++)
-                if (_is_pos_in_map(j, i, max_y, max_x) && (i != x || j != y))
-                    dots.add([j, i]);
-        return dots
-    }
+    var dots = new Set();
+    for (var i = x - r; i < x + r + 1; i++)
+        for (var j = y - r; j < y + r + 1; j++)
+            if (_is_pos_in_map(j, i, max_y, max_x) && (i != x || j != y))
+                dots.add([j, i]);
+    return dots
+}
 ;
 
 function* generate_person(infection_in_population, max_y, max_x, starting_idnum = 0) {
-        var idnum = starting_idnum;
-        var infecteds = 0;
-        while (true) {
-            var [y_dest, x_dest] = get_new_destination(max_y, max_x);
-            var [y, x] = get_new_destination(max_y, max_x);
+    var idnum = starting_idnum;
+    var infecteds = 0;
+    while (true) {
+        var [y_dest, x_dest] = get_new_destination(max_y, max_x);
+        var [y, x] = get_new_destination(max_y, max_x);
 
-            var x_speed = x < x_dest ? 1 : -1;
-            var y_speed = y < y_dest ? 1 : -1;
-            var infection_radius = 1;
-            var p_status = "s";
-            if (infection_in_population >= 1) {
-                if (infecteds < infection_in_population) p_status = "i"
-            } else if (infection_in_population < 1) if (get_random_chance() < infection_in_population * 100) var status = "i";
-            if (p_status == "i") {
-                infecteds++;
-                infection_radius = 2
-            }
-            var person = person_dict(x, y, p_status, infection_radius, 0, x, y,
-                x_dest, y_dest, x_speed, y_speed, 0, 0, -1, 0);
-            // var person = person_dict(__kwargtrans__({
-            //         "loc_x": x, "loc_y": y, "x_home": x, "y_home": y, "x_dest": x_dest, "y_dest": y_dest, "x_speed": x_speed,
-            //         "y_speed": y_speed, "status": p_status, "idnum": idnum, "infection_radius": infection_radius
-            //     }
-            // ));
-            idnum++;
-            yield person
+        var x_speed = x < x_dest ? 1 : -1;
+        var y_speed = y < y_dest ? 1 : -1;
+        var infection_radius = 1;
+        var p_status = "s";
+        if (infection_in_population >= 1) {
+            if (infecteds < infection_in_population) p_status = "i"
+        } else if (infection_in_population < 1) if (get_random_chance() < infection_in_population * 100) var status = "i";
+        if (p_status == "i") {
+            infecteds++;
+            infection_radius = 2
         }
+        var person = person_dict(x, y, p_status, infection_radius, 0, x, y,
+            x_dest, y_dest, x_speed, y_speed, 0, 0, -1, 0);
+        // var person = person_dict(__kwargtrans__({
+        //         "loc_x": x, "loc_y": y, "x_home": x, "y_home": y, "x_dest": x_dest, "y_dest": y_dest, "x_speed": x_speed,
+        //         "y_speed": y_speed, "status": p_status, "idnum": idnum, "infection_radius": infection_radius
+        //     }
+        // ));
+        idnum++;
+        yield person
     }
+}
 ;
 
 function recovery(population, current_day) {//to be called after week 4 and every week afterwards
@@ -271,93 +273,93 @@ function recovery(population, current_day) {//to be called after week 4 and ever
 }
 
 function try_to_infect(infected_person, person) {
-        var actual_radius = infected_person["infection_radius"] + person["infection_radius"];
-        if (actual_radius > 0) {
-            var infection_chance = (infected_person["infection_chance"] + person["infection_chance"]) / 2;
-            var success = infection_chance > get_random_chance();
-            if (success) return true
-        }
-        ;
-        return false
+    var actual_radius = infected_person["infection_radius"] + person["infection_radius"];
+    if (actual_radius > 0) {
+        var infection_chance = (infected_person["infection_chance"] + person["infection_chance"]) / 2;
+        var success = infection_chance > get_random_chance();
+        if (success) return true
     }
+    ;
+    return false
+}
 ;
 
 function infection_spreading(maparr, population, max_y, max_x, current_day) {
-        var newly_infecteds = new Set();
-        //Object.values(population["i"])
-        for (var id_num in population["i"]) {
-            var infected_person = population["i"][id_num];
-            var people_locs = get_surrounding_people(maparr,
-                infected_person["loc_y"],
-                infected_person["loc_x"],
-                infected_person["infection_radius"],
-                max_y,
-                max_x
-                )
-            ;
-            for (var [y, x] of people_locs) for (var idnum of maparr[y][x]) {
-                var person = maparr[y][x][idnum];
-                if (person["status"] == "s") {
-                    var infection_success = try_to_infect(infected_person, person);
-                    if (infection_success) {
-                        newly_infecteds.add(person["idnum"]);
-                        person["infected_by"] = infected_person["idnum"]
-                        person["infection_timestamp"] = current_day;
-                    }
+    var newly_infecteds = new Set();
+    //Object.values(population["i"])
+    for (var id_num in population["i"]) {
+        var infected_person = population["i"][id_num];
+        var people_locs = get_surrounding_people(maparr,
+            infected_person["loc_y"],
+            infected_person["loc_x"],
+            infected_person["infection_radius"],
+            max_y,
+            max_x
+            )
+        ;
+        for (var [y, x] of people_locs) for (var idnum of maparr[y][x]) {
+            var person = maparr[y][x][idnum];
+            if (person["status"] == "s") {
+                var infection_success = try_to_infect(infected_person, person);
+                if (infection_success) {
+                    newly_infecteds.add(person["idnum"]);
+                    person["infected_by"] = infected_person["idnum"]
+                    person["infection_timestamp"] = current_day;
                 }
             }
         }
-        for (var idnum of newly_infecteds) {
-            population["i"][idnum] = population["s"][idnum];
-            delete population["s"][idnum];
-            population["i"][idnum]["status"] = "i";
-            // maparr[population["i"][idnum]["loc_y"]][population["i"][idnum]["loc_x"]]["status"] = "i"
-        }
-        return [maparr, population];
     }
+    for (var idnum of newly_infecteds) {
+        population["i"][idnum] = population["s"][idnum];
+        delete population["s"][idnum];
+        population["i"][idnum]["status"] = "i";
+        // maparr[population["i"][idnum]["loc_y"]][population["i"][idnum]["loc_x"]]["status"] = "i"
+    }
+    return [maparr, population];
+}
 ;
 
 
 function move_one_step(maparr, population, max_y, max_x) {
-        for (var p_status of population)
-            for (var idnum in population[p_status]) {
-                var person = population[p_status][idnum];
-                if (!person["quarantine"]) {
-                    var y = person["loc_y"];
-                    var x = person["loc_x"];
-                    var y_speed = person["y_speed"];
-                    var x_speed = person["x_speed"];
-                    var y_dest = person["y_dest"];
-                    var x_dest = person["x_dest"];
-                    var [new_y, new_x] = _get_next_position(y, x, y_speed, x_speed);
+    for (var p_status of population)
+        for (var idnum in population[p_status]) {
+            var person = population[p_status][idnum];
+            if (!person["quarantine"]) {
+                var y = person["loc_y"];
+                var x = person["loc_x"];
+                var y_speed = person["y_speed"];
+                var x_speed = person["x_speed"];
+                var y_dest = person["y_dest"];
+                var x_dest = person["x_dest"];
+                var [new_y, new_x] = _get_next_position(y, x, y_speed, x_speed);
 
-                    if (new_x == x_dest) var new_x_speed = 0;
-                    else if (Math.abs(new_x - x_dest) >= Math.abs(x - x_dest)) var new_x_speed = -1 * x_speed;
-                    else var new_x_speed = x_speed;
-                    if (new_y == y_dest) var new_y_speed = 0;
-                    else if (Math.abs(new_y - y_dest) >= Math.abs(y - y_dest)) var new_y_speed = -1 * y_speed;
-                    else var new_y_speed = y_speed;
-                    if (new_x == x_dest && new_y == y_dest) {
-                        var [new_y_dest, new_x_dest] = get_new_destination(max_y, max_x);
+                if (new_x == x_dest) var new_x_speed = 0;
+                else if (Math.abs(new_x - x_dest) >= Math.abs(x - x_dest)) var new_x_speed = -1 * x_speed;
+                else var new_x_speed = x_speed;
+                if (new_y == y_dest) var new_y_speed = 0;
+                else if (Math.abs(new_y - y_dest) >= Math.abs(y - y_dest)) var new_y_speed = -1 * y_speed;
+                else var new_y_speed = y_speed;
+                if (new_x == x_dest && new_y == y_dest) {
+                    var [new_y_dest, new_x_dest] = get_new_destination(max_y, max_x);
 
-                        var new_x_speed = x < new_x_dest ? 1 : -1;
-                        var new_y_speed = y < new_y_dest ? 1 : -1;
+                    var new_x_speed = x < new_x_dest ? 1 : -1;
+                    var new_y_speed = y < new_y_dest ? 1 : -1;
 
-                        population[p_status][idnum]["x_speed"]= new_x_speed;
-                        population[p_status][idnum]["y_speed"]= new_y_speed ;
-                        population[p_status][idnum]["x_dest"]= new_x_dest;
-                        population[p_status][idnum]["y_dest"]= new_y_dest;
+                    population[p_status][idnum]["x_speed"] = new_x_speed;
+                    population[p_status][idnum]["y_speed"] = new_y_speed;
+                    population[p_status][idnum]["x_dest"] = new_x_dest;
+                    population[p_status][idnum]["y_dest"] = new_y_dest;
 
-                    }
-                    if (_is_pos_in_map(new_y, new_x, max_y, max_x)) {
-                        [maparr, population] = move_person(maparr, population, idnum, p_status, new_x, new_y);
-                        population[p_status][idnum][x_speed] = new_x_speed;
-                        population[p_status][idnum][y_speed] = new_y_speed;
-                    }
+                }
+                if (_is_pos_in_map(new_y, new_x, max_y, max_x)) {
+                    [maparr, population] = move_person(maparr, population, idnum, p_status, new_x, new_y);
+                    population[p_status][idnum][x_speed] = new_x_speed;
+                    population[p_status][idnum][y_speed] = new_y_speed;
                 }
             }
-        return [maparr, population];
-    }
+        }
+    return [maparr, population];
+}
 ;
 
 function create_maparr(ylen, xlen) {
@@ -394,30 +396,31 @@ function initial_money_state() {
 };
 
 function populate_world(maparr, population_size, infection_in_population) {
-        var population = {
-            "s": {},
-            "i": {},
-            "r": {}
-        };
-        var people_generator = generate_person(infection_in_population, maparr.length, maparr[0].length);
+    var population = {
+        "s": {},
+        "i": {},
+        "r": {}
+    };
+    var people_generator = generate_person(infection_in_population, maparr.length, maparr[0].length);
 
-        for (var i = 0; i < population_size; i++) {
-            var person = people_generator.next().value;
-            maparr[person["loc_y"]][person["loc_x"]][person["idnum"]] = person;
-            population[person["status"]][person["idnum"]] = person
-        }
-        return [maparr, population]
+    for (var i = 0; i < population_size; i++) {
+        var person = people_generator.next().value;
+        maparr[person["loc_y"]][person["loc_x"]][person["idnum"]] = person;
+        population[person["status"]][person["idnum"]] = person
     }
+    return [maparr, population]
+}
 ;
+
 export function construct(ylen, xlen, population_size, infection_in_population) {//first call to init the world
-        var maparr = create_maparr(ylen, xlen);
-        var __left0__ = populate_world(maparr, population_size, infection_in_population);
-        var population = __left0__[0];
-        maparr = __left0__[1];
-        var money_state = initial_money_state();
-        var investments_state = initial_investments_state();
-        return [maparr, population, money_state, investments_state];
-    }
+    var maparr = create_maparr(ylen, xlen);
+    var __left0__ = populate_world(maparr, population_size, infection_in_population);
+    var population = __left0__[1];
+    maparr = __left0__[0];
+    var money_state = initial_money_state();
+    var investments_state = initial_investments_state();
+    return [maparr, population, money_state, investments_state];
+}
 ;
 
 
@@ -449,26 +452,26 @@ export function time_to_simulate(maparr, population, money_state, investments, c
 }
 
 function repopulate_world(maparr, population, population_size, infection_in_population, starting_idnum) {
-        //need to pass population size somewhere to keep track of idnum so it wont overlap
-        // population size is how many people are added
-        var people_generator = generate_person(infection_in_population, maparr.length, maparr[0].length, starting_idnum);
+    //need to pass population size somewhere to keep track of idnum so it wont overlap
+    // population size is how many people are added
+    var people_generator = generate_person(infection_in_population, maparr.length, maparr[0].length, starting_idnum);
 
-        for (var p_status in population) { //repopulate existing population
-            for (var idnum in population[p_status]) {
-                person = population[p_status][idnum];
-                maparr[person["loc_y"]][person["loc_x"]][person["idnum"]] = person;
-            }
-        }
-
-        for (var i = 0; i < population_size; i++) { //add new people to population
-            var person = people_generator.next().value;
-            // var person = {};
+    for (var p_status in population) { //repopulate existing population
+        for (var idnum in population[p_status]) {
+            person = population[p_status][idnum];
             maparr[person["loc_y"]][person["loc_x"]][person["idnum"]] = person;
-            population[person["status"]][person["idnum"]] = person;
         }
-
-        return [maparr, population];
     }
+
+    for (var i = 0; i < population_size; i++) { //add new people to population
+        var person = people_generator.next().value;
+        // var person = {};
+        maparr[person["loc_y"]][person["loc_x"]][person["idnum"]] = person;
+        population[person["status"]][person["idnum"]] = person;
+    }
+
+    return [maparr, population];
+}
 ;
 
 
