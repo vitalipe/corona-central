@@ -1,6 +1,4 @@
-'use strict';
-
-// var __name__ = "__main__";
+goog.provide("corona.sim.py.sim")
 
 
 function person_dict(loc_x = 0, loc_y = 0, c_status = 0,
@@ -39,7 +37,7 @@ function get_random_chance() {//0 to 99
 }
 
 
-export function player_quarantine(maparr, population, money_state, level) {// gets called once per level
+function player_quarantine(maparr, population, money_state, level) {// gets called once per level
     //הסגר (בידוד חלקי - אנשים יברחו החוצה בראנדום כלשהו)  (ברק)
     // 3 רמות, ככל שמשקיעים יותר מרוויחים פחות, וההוצאות האחרות עולות יותר, אבל אנשים שומרים על ההסגר יותר, 20%, 40%, 60%
     [maparr, population] = stay_the_fuck_at_home(maparr, population, level);
@@ -139,7 +137,7 @@ function stay_the_fuck_at_home(maparr, population, level) {
     return [maparr, population];
 };
 
-export function player_detect_infecteds(maparr, population, level) {// gets called regularly
+function player_detect_infecteds(maparr, population, level) {// gets called regularly
     //בדיקות בשביל לבודד חולים (בידוד) (ברק)
     // 10 רמות, כל רמה היא 3% מהאוכלסייה שעוברת בדיקות, הבחירה היא ראנדומית (הבדיקות קורות כל יומיים), אם חולה זוהה כחולה, detected = true, והוא לא עובר בדיקה יותר (ומוכנס לבידוד)
     if (level === 0) {
@@ -224,7 +222,7 @@ function get_surroundings(y, x, r, max_y, max_x) {
                 dots.add([j, i]);
     return dots
 }
-;
+
 
 function* generate_person(infection_in_population, max_y, max_x, starting_idnum = 0) {
     var idnum = starting_idnum;
@@ -413,7 +411,7 @@ function populate_world(maparr, population_size, infection_in_population) {
 }
 ;
 
-export function construct(ylen, xlen, population_size, infection_in_population) {//first call to init the world
+function construct(ylen, xlen, population_size, infection_in_population) {//first call to init the world
     var maparr = create_maparr(ylen, xlen);
     var __left0__ = populate_world(maparr, population_size, infection_in_population);
     var population = __left0__[1];
@@ -436,7 +434,7 @@ function main_loop(maparr, population, current_day) {
 }
 
 
-export function time_to_simulate(maparr, population, money_state, investments, current_day, time_passed) {
+function time_to_simulate(maparr, population, money_state, investments, current_day, time_passed) {
     let time_to_iterations_ratio = 2400; // magic number IDK
     let iterations_per_day = 2400; // magic number IDK
 
@@ -476,7 +474,7 @@ function repopulate_world(maparr, population, population_size, infection_in_popu
 ;
 
 
-export function next_level(maparr, population, money_state, investments, population_size, infection_in_population, starting_idnum) {
+function next_level(maparr, population, money_state, investments, population_size, infection_in_population, starting_idnum) {
     //making a larger array, adding people etc
     let lvl_modifier = 1.25;
     let max_x = Math.floor(maparr[0].length * lvl_modifier);
@@ -486,4 +484,20 @@ export function next_level(maparr, population, money_state, investments, populat
     money_state["daily_income"] = money_state["daily_income"] * lvl_modifier;
     population = recovery(population);
     return [new_maparr, population, money_state, investments];
+}
+
+
+
+// export
+//corona.sim.py.sim.next_level              = next_level;
+//corona.sim.py.sim.construct               = construct;
+//corona.sim.py.sim.time_to_simulate        = time_to_simulate;
+//corona.sim.py.sim.player_quarantine       = player_quarantine;
+//corona.sim.py.sim.player_detect_infecteds = player_detect_infecteds;
+
+corona.sim.py.sim = {
+  next_level, construct,
+  time_to_simulate,
+  player_quarantine,
+  player_detect_infecteds
 }
