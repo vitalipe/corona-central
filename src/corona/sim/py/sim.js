@@ -1,13 +1,10 @@
 'use strict';
 
-// var __name__ = "__main__";
-
-
 function person_dict(loc_x = 0, loc_y = 0, c_status = 0,
-                     infection_radius = 0, infection_chance = 0,
+                     infection_radius = 0, infection_chance = 20,
                      x_home = 0, y_home = 0, x_dest = 0, y_dest = 0,
                      x_speed = 0, y_speed = 0, detected = 0, infection_timestamp = 0,
-                     infected_by = -1, quarantine = 0,idnum = 0) {
+                     infected_by = -1, quarantine = 0, idnum = 0) {
     let person = {
         "loc_x": loc_x,
         "loc_y": loc_y,
@@ -24,24 +21,24 @@ function person_dict(loc_x = 0, loc_y = 0, c_status = 0,
         "infected_by": infected_by,
         "infection_timestamp": infection_timestamp, //day number
         "quarantine": quarantine,
-        "idnum":idnum,
+        "idnum": idnum,
     };
     return person
 };
 
 
-function getRandomInt(max) {// up to max, not including
+function getRandomInt(max) { // up to max, not including
     return Math.floor(Math.random() * Math.floor(max));
 }
 
-function get_random_chance() {//0 to 99
+function get_random_chance() { //0 to 99
     return getRandomInt(100);
 }
 
 
-export function player_quarantine(maparr, population, money_state, level) {// gets called once per level
-    //הסגר (בידוד חלקי - אנשים יברחו החוצה בראנדום כלשהו)  (ברק)
-    // 3 רמות, ככל שמשקיעים יותר מרוויחים פחות, וההוצאות האחרות עולות יותר, אבל אנשים שומרים על ההסגר יותר, 20%, 40%, 60%
+function player_quarantine(maparr, population, money_state, level) { // gets called once per level
+                                                                     //הסגר (בידוד חלקי - אנשים יברחו החוצה בראנדום כלשהו)  (ברק)
+                                                                     // 3 רמות, ככל שמשקיעים יותר מרוויחים פחות, וההוצאות האחרות עולות יותר, אבל אנשים שומרים על ההסגר יותר, 20%, 40%, 60%
     [maparr, population] = stay_the_fuck_at_home(maparr, population, level);
     money_state["prices_modifier"] += 15;
     money_state["daily_income"] = Math.floor(money_state["daily_income"] * 0.85);
@@ -56,7 +53,10 @@ function getRandomSubarray(arr, size) { // we can also use
         return _und.take(_und.shuffle(a), n);
     }
      */
-    var shuffled = arr.slice(0), i = arr.length, min = i - size, temp, index;
+    var shuffled = arr.slice(0),
+        i = arr.length,
+        min = i - size,
+        temp, index;
     while (i-- > min) {
         index = Math.floor((i + 1) * Math.random());
         temp = shuffled[index];
@@ -67,7 +67,7 @@ function getRandomSubarray(arr, size) { // we can also use
 };
 
 
-function player_educate_about_hygiene(maparr, population, money_state, level) {// gets called once per level
+function player_educate_about_hygiene(maparr, population, money_state, level) { // gets called once per level
     let population_under_effect = level * 20;
     var people = [];
     for (var p_status in population) {
@@ -89,7 +89,7 @@ function player_educate_about_hygiene(maparr, population, money_state, level) {/
 };
 
 
-function player_keep_distance(maparr, population, money_state, level) {// gets called once per level
+function player_keep_distance(maparr, population, money_state, level) { // gets called once per level
     let population_under_effect = level * 25;
     var people = [];
     for (var p_status in population) {
@@ -122,7 +122,7 @@ function stay_the_fuck_at_home(maparr, population, level) {
     let amount_of_people_to_check = Math.floor((people.length * population_under_effect) / 100); //how many people are checked
     var rand_array_id = getRandomInt(people.length);
     var checked = new Set();
-    for (var i = 0; i < amount_of_people_to_check; i++) {  // will run for the amount of people needed
+    for (var i = 0; i < amount_of_people_to_check; i++) { // will run for the amount of people needed
         while (checked.has(rand_array_id)) {
             rand_array_id = getRandomInt(people.length);
         }
@@ -139,9 +139,9 @@ function stay_the_fuck_at_home(maparr, population, level) {
     return [maparr, population];
 };
 
-export function player_detect_infecteds(maparr, population, level) {// gets called regularly
-    //בדיקות בשביל לבודד חולים (בידוד) (ברק)
-    // 10 רמות, כל רמה היא 3% מהאוכלסייה שעוברת בדיקות, הבחירה היא ראנדומית (הבדיקות קורות כל יומיים), אם חולה זוהה כחולה, detected = true, והוא לא עובר בדיקה יותר (ומוכנס לבידוד)
+function player_detect_infecteds(maparr, population, level) { // gets called regularly
+                                                              //בדיקות בשביל לבודד חולים (בידוד) (ברק)
+                                                              // 10 רמות, כל רמה היא 3% מהאוכלסייה שעוברת בדיקות, הבחירה היא ראנדומית (הבדיקות קורות כל יומיים), אם חולה זוהה כחולה, detected = true, והוא לא עובר בדיקה יותר (ומוכנס לבידוד)
     if (level === 0) {
         return population;
     }
@@ -158,7 +158,7 @@ export function player_detect_infecteds(maparr, population, level) {// gets call
     let amount_of_people_to_check = Math.floor((people.length * population_percent_to_check) / 100); //how many people are checked
     var checked = new Set(); // set
     var rand_array_id = getRandomInt(people.length);
-    for (var i = 0; i < amount_of_people_to_check; i++) {  // will run for the amount of people needed
+    for (var i = 0; i < amount_of_people_to_check; i++) { // will run for the amount of people needed
         while (checked.has(rand_array_id)) {
             rand_array_id = getRandomInt(people.length);
         }
@@ -175,7 +175,7 @@ export function player_detect_infecteds(maparr, population, level) {// gets call
     return [maparr, population];
 };
 
-function move_person(maparr, population, idnum, p_status, new_x, new_y) {//will break if x and y are out of bounds
+function move_person(maparr, population, idnum, p_status, new_x, new_y) { //will break if x and y are out of bounds
     let cur_x = population[p_status][idnum]["loc_x"];
     let cur_y = population[p_status][idnum]["loc_y"];
 
@@ -189,7 +189,7 @@ function move_person(maparr, population, idnum, p_status, new_x, new_y) {//will 
 };
 
 function _is_pos_in_map(y, x, max_y, max_x) {
-    return (((max_x > x) && (x > 0)) && ((max_y > y) && (y > 0)))
+    return (((max_x > x) && (x >= 0)) && ((max_y > y) && (y >= 0)))
 };
 
 function _get_next_position(y, x, y_speed, x_speed) {
@@ -201,20 +201,18 @@ function get_surrounding_people(maparr, y, x, r, max_y, max_x) {
     for (var i = x - r; i < x + r + 1; i++)
         for (var j = y - r; j < y + r + 1; j++)
             if (_is_pos_in_map(j, i, max_y, max_x) && (i != x || j != y))
-                //Object.keys(maparr[j][i]).length
+            //Object.keys(maparr[j][i]).length
                 if (Object.keys(maparr[j][i]).length > 0)
                     people_loc.add([j, i]);
     return people_loc
-}
-;
+};
 
 function get_new_destination(max_y, max_x) {
     var x = getRandomInt(max_x);
 
     var y = getRandomInt(max_y);
     return [y, x];
-}
-;
+};
 
 function get_surroundings(y, x, r, max_y, max_x) {
     var dots = new Set();
@@ -223,8 +221,7 @@ function get_surroundings(y, x, r, max_y, max_x) {
             if (_is_pos_in_map(j, i, max_y, max_x) && (i != x || j != y))
                 dots.add([j, i]);
     return dots
-}
-;
+};
 
 function* generate_person(infection_in_population, max_y, max_x, starting_idnum = 0) {
     var idnum = starting_idnum;
@@ -236,16 +233,19 @@ function* generate_person(infection_in_population, max_y, max_x, starting_idnum 
         var x_speed = x < x_dest ? 1 : -1;
         var y_speed = y < y_dest ? 1 : -1;
         var infection_radius = 1;
+        let infection_chance = 0;
         var p_status = "s";
         if (infection_in_population >= 1) {
             if (infecteds < infection_in_population) p_status = "i"
-        } else if (infection_in_population < 1) if (get_random_chance() < infection_in_population * 100) var status = "i";
+        } else if (infection_in_population < 1)
+            if (get_random_chance() < infection_in_population * 100) var status = "i";
         if (p_status == "i") {
             infecteds++;
-            infection_radius = 2
+            infection_radius = 2;
+            infection_chance = 20;
         }
-        var person = person_dict(x, y, p_status, infection_radius, 0, x, y,
-            x_dest, y_dest, x_speed, y_speed, 0, 0, -1, 0);
+        var person = person_dict(x, y, p_status, infection_radius, infection_chance, x, y,
+            x_dest, y_dest, x_speed, y_speed, 0, 0, -1, 0, idnum);
         // var person = person_dict(__kwargtrans__({
         //         "loc_x": x, "loc_y": y, "x_home": x, "y_home": y, "x_dest": x_dest, "y_dest": y_dest, "x_speed": x_speed,
         //         "y_speed": y_speed, "status": p_status, "idnum": idnum, "infection_radius": infection_radius
@@ -254,10 +254,9 @@ function* generate_person(infection_in_population, max_y, max_x, starting_idnum 
         idnum++;
         yield person
     }
-}
-;
+};
 
-function recovery(population, current_day) {//to be called after week 4 and every week afterwards
+function recovery(population, current_day) { //to be called after week 4 and every week afterwards
     let infected_status = "i";
     let recovered_status = "r";
     for (var idnum in population[infected_status]) {
@@ -282,30 +281,32 @@ function try_to_infect(infected_person, person) {
     }
     ;
     return false
-}
-;
+};
 
 function infection_spreading(maparr, population, max_y, max_x, current_day) {
     var newly_infecteds = new Set();
     //Object.values(population["i"])
-    for (var id_num in population["i"]) {
-        var infected_person = population["i"][id_num];
-        var people_locs = get_surrounding_people(maparr,
+    for (let id_num in population["i"]) {
+        let infected_person = population["i"][id_num];
+        let people_locs = get_surrounding_people(maparr,
             infected_person["loc_y"],
             infected_person["loc_x"],
             infected_person["infection_radius"],
             max_y,
             max_x
-            )
-        ;
-        for (var [y, x] of people_locs) for (var idnum of maparr[y][x]) {
-            var person = maparr[y][x][idnum];
-            if (person["status"] == "s") {
-                var infection_success = try_to_infect(infected_person, person);
-                if (infection_success) {
-                    newly_infecteds.add(person["idnum"]);
-                    person["infected_by"] = infected_person["idnum"]
-                    person["infection_timestamp"] = current_day;
+        );
+        for (let loc of people_locs) {
+            let y = loc[0];
+            let x = loc[1];
+            for (let idnum in maparr[y][x]) {
+                let person = maparr[y][x][idnum];
+                if (person["status"] == "s") {
+                    let infection_success = try_to_infect(infected_person, person);
+                    if (infection_success) {
+                        newly_infecteds.add(person["idnum"]);
+                        person["infected_by"] = infected_person["idnum"]
+                        person["infection_timestamp"] = current_day;
+                    }
                 }
             }
         }
@@ -317,12 +318,11 @@ function infection_spreading(maparr, population, max_y, max_x, current_day) {
         // maparr[population["i"][idnum]["loc_y"]][population["i"][idnum]["loc_x"]]["status"] = "i"
     }
     return [maparr, population];
-}
-;
+};
 
 
 function move_one_step(maparr, population, max_y, max_x) {
-    for (var p_status of population)
+    for (var p_status in population)
         for (var idnum in population[p_status]) {
             var person = population[p_status][idnum];
             if (!person["quarantine"]) {
@@ -354,14 +354,13 @@ function move_one_step(maparr, population, max_y, max_x) {
                 }
                 if (_is_pos_in_map(new_y, new_x, max_y, max_x)) {
                     [maparr, population] = move_person(maparr, population, idnum, p_status, new_x, new_y);
-                    population[p_status][idnum][x_speed] = new_x_speed;
-                    population[p_status][idnum][y_speed] = new_y_speed;
+                    population[p_status][idnum]["x_speed"] = new_x_speed;
+                    population[p_status][idnum]["y_speed"] = new_y_speed;
                 }
             }
         }
     return [maparr, population];
-}
-;
+};
 
 function create_maparr(ylen, xlen) {
     var map_arr = [];
@@ -372,8 +371,7 @@ function create_maparr(ylen, xlen) {
         }
     }
     return map_arr;
-}
-;
+};
 
 function initial_investments_state() {
     let investments = {
@@ -410,10 +408,9 @@ function populate_world(maparr, population_size, infection_in_population) {
         population[person["status"]][person["idnum"]] = person
     }
     return [maparr, population]
-}
-;
+};
 
-export function construct(ylen, xlen, population_size, infection_in_population) {//first call to init the world
+function construct(ylen, xlen, population_size, infection_in_population) { //first call to init the world
     var maparr = create_maparr(ylen, xlen);
     var __left0__ = populate_world(maparr, population_size, infection_in_population);
     var population = __left0__[1];
@@ -421,8 +418,7 @@ export function construct(ylen, xlen, population_size, infection_in_population) 
     var money_state = initial_money_state();
     var investments_state = initial_investments_state();
     return [maparr, population, money_state, investments_state];
-}
-;
+};
 
 
 function main_loop(maparr, population, current_day) {
@@ -436,9 +432,9 @@ function main_loop(maparr, population, current_day) {
 }
 
 
-export function time_to_simulate(maparr, population, money_state, investments, current_day, time_passed) {
-    let time_to_iterations_ratio = 2400; // magic number IDK
-    let iterations_per_day = 2400; // magic number IDK
+function time_to_simulate(maparr, population, money_state, investments, current_day, time_passed) {
+    let time_to_iterations_ratio = 1; // magic number IDK
+    let iterations_per_day = 5; // magic number IDK
 
     let iterations = time_passed * time_to_iterations_ratio;
     let days = time_passed;
@@ -472,11 +468,10 @@ function repopulate_world(maparr, population, population_size, infection_in_popu
     }
 
     return [maparr, population];
-}
-;
+};
 
 
-export function next_level(maparr, population, money_state, investments, population_size, infection_in_population, starting_idnum) {
+function next_level(maparr, population, money_state, investments, population_size, infection_in_population, starting_idnum) {
     //making a larger array, adding people etc
     let lvl_modifier = 1.25;
     let max_x = Math.floor(maparr[0].length * lvl_modifier);
@@ -486,4 +481,53 @@ export function next_level(maparr, population, money_state, investments, populat
     money_state["daily_income"] = money_state["daily_income"] * lvl_modifier;
     population = recovery(population);
     return [new_maparr, population, money_state, investments];
+}
+
+
+let population_size = 200;
+let infection_in_population = population_size * 0.1;
+let [map_arr, population_dict, money_state, investments_state] = construct(400, 400, population_size, infection_in_population)
+let current_day = 0;
+let time_passed = 1;
+// map_arr[228][0][105] = map_arr[population_dict["s"][105]["loc_y"]][population_dict["s"][105]["loc_x"]][105]
+// delete map_arr[population_dict["s"][105]["loc_y"]][population_dict["s"][105]["loc_x"]][105]
+// population_dict["s"][105]["loc_x"] = 0
+// population_dict["s"][105]["loc_y"] = 228
+// population_dict["s"][105]["x_home"] = 63
+// population_dict["s"][105]["y_home"] = 161
+// population_dict["s"][105]["x_dest"] = 1
+// population_dict["s"][105]["y_dest"] = 140
+let counter = 0;
+
+function setup() {
+    createCanvas(400, 400);
+}
+
+function draw() {
+    background(150, 0, 200);
+    counter += 1
+
+    for (let p_status in population_dict) {
+        for (let idnum in population_dict[p_status]) {
+            let person = population_dict[p_status][idnum];
+            noStroke()
+            if (p_status === 'i') {
+                fill(255, 51, 51); // color red
+            } else if (p_status === 'r') {
+                fill(166, 166, 166); // color grey
+            } else {
+                fill(255, 255, 255); // color white
+            }
+            ellipse(person['loc_x'], person['loc_y'], 2, 2);
+        }
+    }
+    current_day += 1
+    // [map_arr, population_dict, money_state, investments_state]
+    let updated_world = time_to_simulate(map_arr, population_dict, money_state, investments_state, current_day, time_passed)
+    // might be unneeded
+    map_arr = updated_world[0]
+    population_dict = updated_world[1]
+    money_state = updated_world[2]
+    investments_state = updated_world[3]
+    return updated_world
 }
